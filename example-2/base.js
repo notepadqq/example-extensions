@@ -1,7 +1,8 @@
 var net = require('net');
 
 var server = net.Socket();
-server.connect('/tmp/srv');
+var socketPath = process.argv[2];
+server.connect(socketPath);
 
 function sendMessage(msg)
 {
@@ -83,6 +84,8 @@ function processEventMessage(message)
 	
 function convertStubs(dataArray, stubCollection)
 {
+	// FIXME Use a stack
+	
 	for (var i = 0; i < dataArray.length; i++) {
 		if (dataArray[i] !== null && dataArray[i] !== undefined) {
 			if (Array.isArray(dataArray[i])) {
@@ -99,6 +102,15 @@ function convertStubs(dataArray, stubCollection)
 				} else {
 					// FIXME Error: Unknown Stub
 					console.log("Unknown stub: " + stubType);
+				}
+				
+			} else if (typeof dataArray[i] === 'object') {
+				for (var property in dataArray[i]) {
+					if (dataArray[i].hasOwnProperty(property)) {
+						var propValue = [dataArray[i][property]];
+						convertStubs(propValue, Stubs);
+						dataArray[i][property] = propValue[0];
+					}
 				}
 			}
 		}
