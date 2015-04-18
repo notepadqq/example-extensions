@@ -177,17 +177,17 @@ function initializeStub(object, objectId, methods)
 	object.objectId = function() { return objectId; }
 	object.equals = function(other) { return typeof other.objectId === 'function' && this.objectId() === other.objectId(); }
 }
-	
+
 var Stubs = {
 
 	Editor: function (id)
 	{
-		initializeStub(this, id, []);
+		initializeStub(this, id, ["setValue"]);
 	},
 
 	Nqq: function (id)
 	{
-		initializeStub(this, id, ["commandLineArguments", "version", "print", "testGetWindow"]);
+		initializeStub(this, id, ["commandLineArguments", "version", "print"]);
 	},
 
 	Window: function (id)
@@ -197,8 +197,4 @@ var Stubs = {
 	
 }
 
-
-//module.exports.invokeApi = invokeApi;
 module.exports.Nqq = new Stubs.Nqq(1);
-//module.exports.sendMessage = sendMessage;
-//module.exports.getEditorStub = getEditorStub;
