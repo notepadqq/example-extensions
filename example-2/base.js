@@ -1,7 +1,9 @@
 var net = require('net');
 
-var server = net.Socket();
 var socketPath = process.argv[2];
+var extensionId = process.argv[3];
+
+var server = net.Socket();
 server.connect(socketPath);
 
 function sendMessage(msg)
@@ -67,8 +69,8 @@ function processEventMessage(message)
 	var objectId = message["objectId"];
 	
 	// See if there are handlers for this event
-	if (eventHandlers[event] !== undefined && Array.isArray(eventHandlers[event][objectId])) {
-		var handlers = eventHandlers[event][objectId];
+	if (eventHandlers[objectId] !== undefined && Array.isArray(eventHandlers[objectId][event])) {
+		var handlers = eventHandlers[objectId][event];
 		
 		// Convert stubs
 		var args = message["args"];
@@ -100,8 +102,7 @@ function convertStubs(dataArray, stubCollection)
 					var id = dataArray[i]["id"];
 					dataArray[i] = new stubCollection[stubType](id);
 				} else {
-					// FIXME Error: Unknown Stub
-					console.log("Unknown stub: " + stubType);
+					console.error("Unknown stub: " + stubType);
 				}
 				
 			} else if (typeof dataArray[i] === 'object') {
@@ -132,15 +133,15 @@ function invokeApi (objectId, method, args, callback)
 
 function registerEventHandler(objectId, event, callback)
 {
-	if (eventHandlers[event] === undefined) {
-		eventHandlers[event] = {};
+	if (eventHandlers[objectId] === undefined) {
+		eventHandlers[objectId] = {};
 	}
 	
-	if (eventHandlers[event][objectId] === undefined) {
-		eventHandlers[event][objectId] = [];
+	if (eventHandlers[objectId][event] === undefined) {
+		eventHandlers[objectId][event] = [];
 	}
 	
-	eventHandlers[event][objectId].push(callback);
+	eventHandlers[objectId][event].push(callback);
 }
 
 // Gets the implementation for a stub method with the specified name.
@@ -192,9 +193,15 @@ var Stubs = {
 
 	Window: function (id)
 	{
-		initializeStub(this, id, ["currentEditor"]);
+		initializeStub(this, id, ["addExtensionMenuItem", "currentEditor"]);
+	},
+	
+	MenuItem: function (id)
+	{
+		initializeStub(this, id, []);
 	},
 	
 }
 
+module.exports.extensionId = extensionId;
 module.exports.Nqq = new Stubs.Nqq(1);

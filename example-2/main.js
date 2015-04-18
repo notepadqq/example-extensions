@@ -16,5 +16,11 @@ base.Nqq.on("newWindow", function(window) {
 	
 	window.currentEditor(function(editor){
 		editor.setValue("Hi! It's " + new Date().toLocaleString());
-	})
+	});
+	
+	window.addExtensionMenuItem(base.extensionId, "TEST MENU", function(menu) {
+		menu.on("triggered", function() {
+			base.Nqq.print("Menu clicked!");
+		});
+	});
 });
