@@ -9,12 +9,13 @@ function sendMessage(msg)
 }
 
 var callbacks = [];
+var eventHandlers = {};
 var bufferedData = "";
 
 server.on('data', function (data) {
 	var dataString = bufferedData + data.toString();
 	var messages = data.toString().split("\n");
-	
+
 	// messages can be an array like the following ones:
 	//     [msg1, msg2, ..., msgn, ""] => we received n complete messages.
 	//     [msg1, msg2, ..., msgn] => we received n-1 complete messages, and an incomplete one.
@@ -34,21 +35,73 @@ server.on('data', function (data) {
 
 function processMessage(message)
 {
-	//console.log(message);
+	console.log(message);
+	var dataObj = JSON.parse(message);
+	
+	if (dataObj["result"] !== undefined) {
+		processResultMessage(dataObj);
+	} else if (dataObj["event"] !== undefined) {
+		processEventMessage(dataObj);
+	}
+}
+
+function processResultMessage(message)
+{
 	var callback = callbacks.shift();
 	
-	// Convert data = ["type", id]
-	var dataObj = JSON.parse(message);
-	var retval = null;
-	var err = dataObj["err"];
-	
-	/*if (dataObj[0] == 'Editor') {
-		retval = new Editor(dataObj[1]);
-	}*/
-	retval = dataObj["return"];
-	
 	if (callback !== undefined && callback !== null) {
-		callback(retval, err);
+		var err = message["err"];
+	
+		var result = [message["result"]];
+		convertStubs(result, Stubs);
+		result = result[0];
+		
+		callback(result, err);
+	}
+}
+
+function processEventMessage(message)
+{
+	var event = message["event"];
+	var objectId = message["objectId"];
+	
+	// See if there are handlers for this event
+	if (eventHandlers[event] !== undefined && Array.isArray(eventHandlers[event][objectId])) {
+		var handlers = eventHandlers[event][objectId];
+		
+		// Convert stubs
+		var args = message["args"];
+		convertStubs(args, Stubs);
+		
+		// Call handlers
+		for (var i = handlers.length - 1; i >= 0; i--) {
+			var fun = handlers[i];
+			fun.apply(fun, args);
+		}
+	}
+}
+	
+function convertStubs(dataArray, stubCollection)
+{
+	for (var i = 0; i < dataArray.length; i++) {
+		if (dataArray[i] !== null && dataArray[i] !== undefined) {
+			if (Array.isArray(dataArray[i])) {
+				convertStubs(dataArray[i], stubCollection);
+				
+			} else if (typeof dataArray[i]["$__nqq__stub_type"] === 'string'
+					   && typeof dataArray[i]["id"] === 'number') {
+				
+				var stubType = dataArray[i]["$__nqq__stub_type"];
+					   
+				if (typeof stubCollection[stubType] === 'function') {  
+					var id = dataArray[i]["id"];
+					dataArray[i] = new stubCollection[stubType](id);
+				} else {
+					// FIXME Error: Unknown Stub
+					console.log("Unknown stub: " + stubType);
+				}
+			}
+		}
 	}
 }
 
@@ -63,6 +116,19 @@ function invokeApi (objectId, method, args, callback)
 	};
 	
 	sendMessage(JSON.stringify(message));
+}
+
+function registerEventHandler(objectId, event, callback)
+{
+	if (eventHandlers[event] === undefined) {
+		eventHandlers[event] = {};
+	}
+	
+	if (eventHandlers[event][objectId] === undefined) {
+		eventHandlers[event][objectId] = [];
+	}
+	
+	eventHandlers[event][objectId].push(callback);
 }
 
 // Gets the implementation for a stub method with the specified name.
@@ -91,19 +157,36 @@ function initializeStub(object, objectId, methods)
 		var name = methods[i];
 		object[name] = getStubMethod(objectId, name);
 	}
+	
+	object.on = function(event, callback) {
+		registerEventHandler(objectId, event, callback);
+	}
+	
+	object.objectId = function() { return objectId; }
+	object.equals = function(other) { return typeof other.objectId === 'function' && this.objectId() === other.objectId(); }
+}
+	
+var Stubs = {
+
+	Editor: function (id)
+	{
+		initializeStub(this, id, []);
+	},
+
+	Nqq: function (id)
+	{
+		initializeStub(this, id, ["commandLineArguments", "version", "print", "testGetWindow"]);
+	},
+
+	Window: function (id)
+	{
+		initializeStub(this, id, ["currentEditor"]);
+	},
+	
 }
 
-function Editor(id)
-{
-	initializeStub(this, id, []);
-}
-
-function Nqq(id)
-{
-	initializeStub(this, id, ["commandLineArguments", "version", "print"]);
-}
 
 //module.exports.invokeApi = invokeApi;
-module.exports.Nqq = new Nqq(1);
+module.exports.Nqq = new Stubs.Nqq(1);
 //module.exports.sendMessage = sendMessage;
 //module.exports.getEditorStub = getEditorStub;
