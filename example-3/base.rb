@@ -13,6 +13,8 @@ class Base
   @@eventHandlers = {}
   
   def self.registerEventHandler(objectId, event, callback)
+    event = event.to_sym
+    
     @@eventHandlers[objectId] ||= {}
     @@eventHandlers[objectId][event] ||= []
     
@@ -157,7 +159,7 @@ private
   end
   
   def self.processEventMessage(message)
-    event = message["event"]
+    event = message["event"].to_sym
     objectId = message["objectId"]
     
     if @@eventHandlers[objectId] and @@eventHandlers[objectId][event]
