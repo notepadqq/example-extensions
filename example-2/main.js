@@ -4,8 +4,7 @@ base.Nqq.commandLineArguments(function (retval, err) {
 	console.log(retval);
 });
 
-base.Nqq.version(function (v) { 
-	//console.log("Using Notepadqq version " + v);
+base.Nqq.version(function (v) {
 	base.Nqq.print("Using Notepadqq version " + v);
 });
 

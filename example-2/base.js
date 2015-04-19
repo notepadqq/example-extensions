@@ -3,19 +3,19 @@ var net = require('net');
 var socketPath = process.argv[2];
 var extensionId = process.argv[3];
 
-var server = net.Socket();
-server.connect(socketPath);
+var client = net.Socket();
+client.connect(socketPath); // FIXME It's async! What if the connection takes some time?
 
 function sendMessage(msg)
 {
-	server.write(msg + "\n");
+	client.write(msg + "\n");
 }
 
 var callbacks = [];
 var eventHandlers = {};
 var bufferedData = "";
 
-server.on('data', function (data) {
+client.on('data', function (data) {
 	var dataString = bufferedData + data.toString();
 	var messages = data.toString().split("\n");
 
@@ -38,7 +38,7 @@ server.on('data', function (data) {
 
 function processMessage(message)
 {
-	console.log(message);
+	//console.log(message);
 	var dataObj = JSON.parse(message);
 	
 	if (dataObj["result"] !== undefined) {
@@ -183,7 +183,7 @@ var Stubs = {
 
 	Editor: function (id)
 	{
-		initializeStub(this, id, ["setValue"]);
+		initializeStub(this, id, ["setValue", "value"]);
 	},
 
 	Nqq: function (id)
