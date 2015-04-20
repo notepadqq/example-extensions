@@ -66,13 +66,13 @@ private
   def self.getMessages(block=true)
     
     begin
-      if block
+      if block and @@incomingBuffer.empty? and @@parsedBuffer.empty?
         read = @@client.recv(1048576)
       else
         read = @@client.recv_nonblock(1048576)
       end
     rescue
-      return []
+      read = ""
     end
     
     @@incomingBuffer += read
