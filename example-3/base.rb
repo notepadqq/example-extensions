@@ -41,6 +41,7 @@ class Base
   end
 
   def self.runEventLoop
+    yeld
     
     while true do
       messages = self.getMessages

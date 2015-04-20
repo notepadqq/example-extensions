@@ -1,10 +1,12 @@
 require './base'
 
-puts nqq.version
+Base.runEventLoop do
 
-nqq.on(:newWindow) { |window|
-  p window
-  window.currentEditor.setValue("Ciao ;-)")
-}
+  puts nqq.version
 
-Base.runEventLoop
+  nqq.on(:newWindow) { |window|
+    p window
+    window.currentEditor.setValue("Ciao ;-)")
+  }
+
+end
