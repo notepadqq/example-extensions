@@ -200,3 +200,5 @@ module Stubs
   class MenuItem < Stub; end
   
 end
+
+nqq = Stubs::Nqq.new(1);
