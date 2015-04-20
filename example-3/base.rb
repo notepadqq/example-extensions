@@ -5,13 +5,23 @@ class Base
   @@socketPath = ARGV[0]
   @@extensionId = ARGV[1]
 
+  # Connect to Notepadqq socket
   @@client = UNIXSocket.open(@@socketPath)
   
-  @@incomingBuffer = "" # Partial string messages
+  @@incomingBuffer = "" # Incomplete json messages (as strings)
   @@parsedBuffer = [] # Unprocessed object messages
   
+  # Hash of event handlers, for example
+  # {
+  #   1: {
+  #     "newWindow": [<callback1>, ..., <callbackn>]
+  #   },
+  #   ...
+  # }
+  # Where 1 is an objectId and "newWindow" is an event of that object
   @@eventHandlers = {}
   
+  # Assign an event of a particular objectId to a callback
   def self.registerEventHandler(objectId, event, callback)
     event = event.to_sym
     
@@ -21,6 +31,7 @@ class Base
     @@eventHandlers[objectId][event].push(callback)
   end
   
+  # Calls a method on the remote object objectId
   def self.invokeApi(objectId, method, args)
     message = {
       :objectId => objectId,
@@ -40,8 +51,9 @@ class Base
     return result
   end
 
+  # Start reading messages and calling event handlers
   def self.runEventLoop
-    yeld
+    yield
     
     while true do
       messages = self.getMessages
@@ -58,6 +70,7 @@ class Base
   
 private
   
+  # Sends a raw string message to Notepadqq
   def self.sendRawMessage(msg)
     @@client.send(msg, 0)
   end
@@ -165,6 +178,7 @@ private
     }
   end
   
+  # Call the handlers connected to this event
   def self.processEventMessage(message)
     event = message["event"].to_sym
     objectId = message["objectId"]
@@ -179,6 +193,12 @@ private
         handlers[i].call(*args)
       }
     end
+  end
+  
+  # Returns an instance of Nqq
+  def self.nqq
+    @nqq ||= Stubs::Nqq.new(1);
+    return @nqq
   end
 
 end
@@ -207,5 +227,3 @@ module Stubs
   class MenuItem < Stub; end
   
 end
-
-nqq = Stubs::Nqq.new(1);
