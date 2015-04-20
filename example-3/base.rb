@@ -98,6 +98,12 @@ private
     
     retval = @@parsedBuffer + converted
     @@parsedBuffer = []
+    
+    # Make sure that, when block=true, at least one message is received
+    if block and retval.empty?
+      retval += getMessages(true)
+    end
+    
     return retval
   end
   
