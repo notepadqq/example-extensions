@@ -1,10 +1,10 @@
 require 'bundler/setup'
 require 'securerandom'
-require_relative 'communication_interface'
+require_relative 'nqq_api_layer'
 
-CommunicationInterface.runEventLoop do
+NqqApiLayer.runEventLoop do
   
-  @nqq = CommunicationInterface.nqq
+  @nqq = NqqApiLayer.nqq
   @initializedWindows = []
 
   # As soon as the extension is started, initialize
@@ -31,7 +31,7 @@ CommunicationInterface.runEventLoop do
     @initializedWindows.push window
     
     # Add a menu item
-    menu = window.addExtensionMenuItem(CommunicationInterface.extensionId, "Generate GUID")
+    menu = window.addExtensionMenuItem(NqqApiLayer.extensionId, "Generate GUID")
     menu.on(:triggered) do
       window.currentEditor.setSelectionsText([SecureRandom.uuid])
     end
