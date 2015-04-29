@@ -1,4 +1,4 @@
-class Base
+class CommunicationInterface
   require 'socket'
   require 'json'
   
@@ -216,11 +216,11 @@ module Stubs
     end
 
     def on(event, &callback)
-      Base.registerEventHandler(@id, event, callback)
+      CommunicationInterface.registerEventHandler(@id, event, callback)
     end
 
     def method_missing(method, *args, &block)  
-      return Base.invokeApi(@id, method, args)
+      return CommunicationInterface.invokeApi(@id, method, args)
     end 
     
     def ==(other)
