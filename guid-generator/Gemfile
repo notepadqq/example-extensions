@@ -1,3 +1,3 @@
 source "https://rubygems.org"
 
-gem "json"
+gem 'notepadqq_api', '~> 0.1'

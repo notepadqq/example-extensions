@@ -1,10 +1,17 @@
 require 'bundler/setup'
+require 'notepadqq_api'
 require 'securerandom'
-require_relative 'nqq_api_layer'
 
-NqqApiLayer.runEventLoop do
+# Initialize a new API instance
+@notepadqqApi = NotepadqqApi.new
+
+# Start the event loop
+@notepadqqApi.runEventLoop do
   
-  @nqq = NqqApiLayer.nqq
+  # Get a reference to the main Notepadqq object
+  @nqq = @notepadqqApi.notepadqq
+  
+  # Array of already initialized windows
   @initializedWindows = []
 
   # As soon as the extension is started, initialize
@@ -31,7 +38,7 @@ NqqApiLayer.runEventLoop do
     @initializedWindows.push window
     
     # Add a menu item
-    menu = window.addExtensionMenuItem(NqqApiLayer.extensionId, "Generate GUID")
+    menu = window.addExtensionMenuItem(@notepadqqApi.extensionId, "Generate GUID")
     menu.on(:triggered) do
       window.currentEditor.setSelectionsText([SecureRandom.uuid])
     end
