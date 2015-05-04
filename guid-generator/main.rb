@@ -2,6 +2,8 @@ require 'bundler/setup'
 require 'notepadqq_api'
 require 'securerandom'
 
+$stdout.sync = true
+
 # Initialize a new API instance
 @notepadqqApi = NotepadqqApi.new
 
