@@ -3,17 +3,18 @@ require 'notepadqq_api'
 require 'securerandom'
 
 $stdout.sync = true
+$stderr.sync = true
 
 # Initialize a new API instance
-@notepadqqApi = NotepadqqApi.new
+@api = NotepadqqApi.new
 
 # Start the event loop
-@notepadqqApi.runEventLoop do
+@api.run_event_loop do
 
   # Each time a new window gets opened, initialize it.
-  @notepadqqApi.onWindowCreated do |window|
+  @api.on_window_created do |window|
     # Add a menu item
-    menu = window.addExtensionMenuItem(@notepadqqApi.extensionId, "Generate GUID")
+    menu = window.addExtensionMenuItem(@api.extension_id, "Generate GUID")
     menu.on(:triggered) do
       window.currentEditor.setSelectionsText([SecureRandom.uuid])
     end
