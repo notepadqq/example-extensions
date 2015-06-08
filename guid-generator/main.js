@@ -2,7 +2,6 @@ var NotepadqqApi = require("notepadqq-api")
 var uuid = require('uuid');
 
 var api = new NotepadqqApi.NotepadqqApi();
-//var nqq = api.notepadqq;
 
 api.onWindowInitialization(function(window) {
 	
