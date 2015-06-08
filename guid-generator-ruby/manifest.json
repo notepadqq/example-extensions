@@ -4,7 +4,7 @@
   "author": "notepadqq",
   "version": "1.0.0",
   "description": "A simple GUID generator",
-  "runtime": "python",
-  "runtime_version": "3",
-  "main": "main.py"
+  "runtime": "ruby",
+  "runtime_version": "2.1",
+  "main": "main.rb"
 }
