@@ -1,9 +1,13 @@
 {
   "name": "guid-generator",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "dependencies": {
     "notepadqq-api": ">=0.9.1 <0.10.0",
     "uuid": "2.x.x"
   },
+  "bundledDependencies": [
+    "notepadqq-api",
+    "uuid"
+  ],
   "private": true
 }
