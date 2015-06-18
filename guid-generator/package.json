@@ -5,9 +5,5 @@
     "notepadqq-api": ">=0.9.1 <0.10.0",
     "uuid": "2.x.x"
   },
-  "bundledDependencies": [
-    "notepadqq-api",
-    "uuid"
-  ],
   "private": true
 }
