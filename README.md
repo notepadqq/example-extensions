@@ -14,10 +14,10 @@ We prefer to keep `node_modules` checked in in git. Here's how (we assume your d
   2. Run these commands from your project root (replace the git commands if you're
      using a different tool):
   
-        npm install --ignore-scripts    # Download modules without building them
-        git add . && git commit -a      # Check in modules
-        npm rebuild                     # Build the modules
-        git status                      # Show the files created by the build (there might not be any)
+         npm install --ignore-scripts    # Download modules without building them
+         git add . && git commit -a      # Check in modules
+         npm rebuild                     # Build the modules
+         git status                      # Show the files created by the build (there might not be any)
 		
   3. Add the new files to `.gitignore` (or equivalent) and check it in.
   
