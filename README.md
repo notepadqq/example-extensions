@@ -1,4 +1,4 @@
-# File encoding autodetect extension
+# File encoding auto detection extension
 Example extensions for Notepadqq
 
 Each extension should be put within `~/.config/Notepadqq/extensions/`
